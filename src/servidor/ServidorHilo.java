@@ -36,7 +36,7 @@ public class ServidorHilo implements Runnable
 		String fichero;
 		boolean seguir = true;
 		introduccion="Bienvenido a tu servidor: "+this.ruta;
-		menu = "Selecciona alguna de estas opciones: \r\n 1:Descargar Archivo \r\n  2:Enviar un archivo al servidor (introducir ruta añadiendo al inicio \\..) \r\n 3:Terminar)";
+		menu = "Selecciona alguna de estas opciones: \r\n 1:Descargar Archivo \r\n  2:Enviar un archivo al servidor (introducir ruta añadiendo al inicio \\..) \r\n Otro:Terminar)";
 		try 
 		{
 			//Enviamos mensaje bienvenida
@@ -44,18 +44,18 @@ public class ServidorHilo implements Runnable
 			dos.flush();
 			while(seguir==true)
 			{
-			   introduccion="Introduce una opcion de estas para continuar \r\n";
-			   dos.writeBytes(introduccion);
+			   introduccion="Introduce una opcion de estas para continuar ";
+			   dos.writeChars(introduccion);
 			   dos.flush();
-			   dos.writeBytes(menu);
+			   dos.writeChars(menu);
 			   dos.flush();
 			   opcion = dis.readInt();
-			   dos.writeBytes(toString(""));
+			   dos.writeChars(toString(""));
 			   dos.flush();
 			   if(opcion==1)
 			   {
 				  introduccion="Selecciona el nombre del fichero a descargar dentro de esa carpeta (acompañado de la ruta empezando por \\)";
-				  dos.writeBytes(introduccion);
+				  dos.writeChars(introduccion);
 				  dos.flush();
 				  //leemos el fichero a recibir
 				  fichero=dis.readLine();
@@ -65,12 +65,12 @@ public class ServidorHilo implements Runnable
 			   else if(opcion == 2)
 			   {
 				   introduccion="Seleccione la nueva ruta de acorde a las instrucciones dadas anteriormente \r\n Introduce la ruta \r\n";
-				   dos.writeBytes(introduccion);
+				   dos.writeChars(introduccion);
 				   dos.flush();
 				   //Recibimos la ruta
 				   ruta = dis.readLine();
 				   introduccion="Introduce la extension \r\n";
-				   dos.writeBytes(introduccion);
+				   dos.writeChars(introduccion);
 				   dos.flush();
 				   extension = dis.readLine();
 				   recibirArchivo(ruta,extension);

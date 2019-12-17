@@ -30,73 +30,82 @@ public class Servidor
 		String usuario=null;
 		String contraseña=null;
 		String correoelectronico=null;;
-		try
-		(ServerSocket ss = new ServerSocket(82);
-				Socket s = ss.accept();
-				DataOutputStream dos= new DataOutputStream(s.getOutputStream());
-				DataInputStream dis = new DataInputStream(s.getInputStream())
-				)
-		{
+		
+		try(ServerSocket ss = new ServerSocket(82)){
 			while(true)
-			{
-				//Pedimos que seleccione una opcion entre registrarse y logearse 
-				opcion = dis.read();
-				
-				//Opcion logearse
-				if(opcion==1)
+			{	
+				try
+				(
+						Socket s = ss.accept();
+						DataOutputStream dos= new DataOutputStream(s.getOutputStream());
+						DataInputStream dis = new DataInputStream(s.getInputStream())
+						)
 				{
-					boolean comprobacion = false;
 					
-					while(comprobacion==false)
-					{
-						//recibimos el usuario
-						usuario=dis.readLine();
-						//comprobamos que el usuario se encuentra en nuestro xml
-						comprobacion = comprobacionUsuarioExistente(usuario);
-						dos.writeBoolean(comprobacion);
-						if(comprobacion==true)
-						{
-							comprobacion=false;
-							while(comprobacion == false)
-							{
-								contraseña = dis.readLine();
-								comprobacion=comprobacionUsuarioContraseña(usuario,contraseña);
-								dos.writeBoolean(comprobacion);
-							}
-							//logeo correcto
-						}
-					}
-				}
-				else
-				{
-					boolean comprobacion= false;
-					while(comprobacion==false)
-					{
-						//Recibimos el usuario
-						usuario=dis.readLine();
-						//Comprobamos que el usuario no esta en nustro xml
-						comprobacion=comprobacionUsuarioExistente(usuario);
-						dos.writeBoolean(comprobacion);
+				
+						//Pedimos que seleccione una opcion entre registrarse y logearse 
+						opcion = dis.readInt();
 						
-					}
-					//Recibimos contraseña
-					contraseña=dis.readLine();
-					//Recibimos correoelectronico
-					correoelectronico=dis.readLine();
-					aniadirusuarioNuevo(usuario, contraseña, correoelectronico);
+						//Opcion logearse
+						if(opcion==1)
+						{
+							boolean comprobacion1 = false;
+							
+							while(comprobacion1==false)
+							{
+								//recibimos el usuario
+								usuario=dis.readLine();
+								//comprobamos que el usuario se encuentra en nuestro xml
+								comprobacion1 = comprobacionUsuarioExistente(usuario);
+								dos.writeBoolean(comprobacion1);
+								if(comprobacion1==true)
+								{
+									boolean comprobacion2=false;
+									while(comprobacion2 == false)
+									{
+										contraseña = dis.readLine();
+										comprobacion2=comprobacionUsuarioContraseña(usuario,contraseña);
+										dos.writeBoolean(comprobacion2);
+									}
+									//logeo correcto
+								}
+							}
+						}
+						else 
+						{
+							boolean comprobacion= false;
+							while(comprobacion==false)
+							{
+								//Recibimos el usuario
+								usuario=dis.readLine();
+								//Comprobamos que el usuario no esta en nustro xml
+								comprobacion=comprobacionUsuarioExistente(usuario);
+								dos.writeBoolean(comprobacion);
+								
+							}
+							//Recibimos contraseña
+							contraseña=dis.readLine();
+							//Recibimos correoelectronico
+							correoelectronico=dis.readLine();
+							aniadirusuarioNuevo(usuario, contraseña, correoelectronico);
+						}
+						
+						Executor pool = Executors.newCachedThreadPool();
+						pool.execute(new ServidorHilo(s,usuario,dos,dis));
+						
+		
+						
 				}
 				
-				Executor pool = Executors.newCachedThreadPool();
-				pool.execute(new ServidorHilo(s,usuario,dos,dis));
-				
-
-				
+				catch (IOException e) 
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-		}
-		catch (IOException e) 
-		{
+		} catch (IOException e1) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e1.printStackTrace();
 		}
 	}
 	
@@ -152,18 +161,16 @@ public class Servidor
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db;
 			db = dbf.newDocumentBuilder();
+			
 			Document doc =db.parse(new File("src\\dtds\\Usuarios.xml"));
-			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			Transformer transformer = transformerFactory.newTransformer();
-			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(new File("src\\dtds\\Usuarios.xml"));
+			Element root = doc.getDocumentElement();
+			
 			
 			//creamos los elementos para añadir
 			Element cliente = doc.createElement("cliente");
 			cliente.setAttribute("usuario", usuario);
 			Element contraseña = doc.createElement("contrasena");
 			Element correoelectronico = doc.createElement("correoelectronico");
-			Element root = doc.createElement("root");
 			
 			//realizamos las uniones de los elementos d manera correcta
 			Text txt2 = doc.createTextNode(contrasena);
@@ -174,6 +181,11 @@ public class Servidor
 			cliente.appendChild(correoelectronico);
 			root.appendChild(cliente);
 			//Realizamos la transformacion
+			
+			DOMSource  source = new DOMSource(doc);
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			StreamResult result = new StreamResult(new File("src\\dtds\\Usuarios.xml"));
 			transformer.transform(source, result);
 			b=true;
 		}
