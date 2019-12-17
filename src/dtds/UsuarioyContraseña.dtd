@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT root (cliente+)>
+<!ELEMENT cliente (contrasena,correoelectronico)>
+<!ATTLIST cliente
+           usuario ID #REQUIRED>
+<!ELEMENT contrasena (#PCDATA)>   
+<!ELEMENT correoelectronico (#PCDATA)>
+           

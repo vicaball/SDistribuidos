@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE root SYSTEM "../../bin/dtds/UsuarioyContraseña.dtd" >
+<root>
+  <cliente usuario="vicaball">
+    <contrasena>12345</contrasena>
+    <correoelectronico>vc7@gmail.com</correoelectronico>
+  </cliente>
+  <cliente usuario="jorlaOr">
+    <contrasena>12345</contrasena>
+    <correoelectronico>jor@unirioja.es</correoelectronico>
+  </cliente>
+</root>
