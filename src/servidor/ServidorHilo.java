@@ -27,59 +27,47 @@ public class ServidorHilo implements Runnable
     
 	public void run() 
 	{
-		
-		String introduccion;
-		String menu;
 		String ruta;
 		String extension;
-		int opcion;
-		String fichero;
-		boolean seguir = true;
-		introduccion="Bienvenido a tu servidor: "+this.ruta;
-		menu = "Selecciona alguna de estas opciones: \r\n 1:Descargar Archivo \r\n  2:Enviar un archivo al servidor (introducir ruta añadiendo al inicio \\..) \r\n Otro:Terminar)";
+		int opcion =1;
+
 		try 
 		{
-			//Enviamos mensaje bienvenida
-			dos.writeChars(introduccion);
-			dos.flush();
-			while(seguir==true)
+
+			while(opcion<=3)
 			{
-			   introduccion="Introduce una opcion de estas para continuar ";
-			   dos.writeChars(introduccion);
-			   dos.flush();
-			   dos.writeChars(menu);
-			   dos.flush();
-			   opcion = dis.readInt();
-			   dos.writeChars(toString(""));
-			   dos.flush();
-			   if(opcion==1)
-			   {
-				  introduccion="Selecciona el nombre del fichero a descargar dentro de esa carpeta (acompañado de la ruta empezando por \\)";
-				  dos.writeChars(introduccion);
-				  dos.flush();
-				  //leemos el fichero a recibir
-				  fichero=dis.readLine();
-				  enviarArchivo(fichero);
-				  
-			   }
-			   else if(opcion == 2)
-			   {
-				   introduccion="Seleccione la nueva ruta de acorde a las instrucciones dadas anteriormente \r\n Introduce la ruta \r\n";
-				   dos.writeChars(introduccion);
-				   dos.flush();
-				   //Recibimos la ruta
-				   ruta = dis.readLine();
-				   introduccion="Introduce la extension \r\n";
-				   dos.writeChars(introduccion);
-				   dos.flush();
-				   extension = dis.readLine();
-				   recibirArchivo(ruta,extension);
-			   }
-			   else
-			   {
-				   //finaliza 
-				   seguir=false;
-			   }
+				//Recibimos la opcion
+				opcion=this.dis.readInt();
+				
+				//Enviamos el contenido de nuestro drive
+				dos.writeChars(this.toString(""));
+				dos.flush();
+				
+				if(opcion==1)
+				{
+					//recibimos la ruta
+					ruta = dis.readLine();
+					
+					//Enviamos el nombre del archivo
+					String[] rutas = ruta.split("\\");
+					//Enviamos el nombre del fichero con su extensión si la tiene
+					dos.writeChars(rutas[rutas.length-1]);
+					
+					enviarArchivo(ruta);
+				}
+				else if(opcion==2)
+				{
+					//recibimos la ruta
+					ruta=dis.readLine();
+					//recibimos la ruta
+					recibirArchivo(ruta);
+
+					
+					
+					
+					
+				}
+			  
 			}
 		} 
 		catch (IOException e) 
@@ -133,7 +121,7 @@ public class ServidorHilo implements Runnable
 	//Envia un archivo al cliente
 	public void enviarArchivo(String a)
 	{
-		File f = new File(this.ruta+a);
+		File f = new File(a);
 	    
 	    try 
 	    {
@@ -143,8 +131,8 @@ public class ServidorHilo implements Runnable
 			while((leidos= fis.read(buff))!=-1)
 			{
 				this.dos.write(buff, 0, leidos);
-				dos.flush();
 			}
+			dos.flush();
 			//preguntar extension
 		} 
 	    catch (FileNotFoundException e)
@@ -161,11 +149,9 @@ public class ServidorHilo implements Runnable
 	}
 	
 	//Recibe un archivo
-	public void  recibirArchivo(String ruta, String extension)
+	public void  recibirArchivo(String ruta)
 	{
-		File f = new File(this.ruta+ruta+extension);
-		//Extension
-		//f.getName().substring(f.getName().lastIndexOf('.'));
+		File f = new File(ruta);
 		
 		try 
 		{
