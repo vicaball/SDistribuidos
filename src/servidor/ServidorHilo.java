@@ -27,6 +27,7 @@ public class ServidorHilo implements Runnable
     
 	public void run() 
 	{
+		String bienvenida;
 		String ruta;
 		String extension;
 		int opcion =1;
@@ -34,8 +35,12 @@ public class ServidorHilo implements Runnable
 		try 
 		{
 
-			while(opcion<=3)
+			while(opcion<3)
 			{
+				String[] aux=this.ruta.split("\\");
+				bienvenida="Bienvenido a tu servidor "+aux[aux.length-1];
+				dos.writeChars(bienvenida);
+				
 				//Recibimos la opcion
 				opcion=this.dis.readInt();
 				
@@ -88,29 +93,30 @@ public class ServidorHilo implements Runnable
 	//Muestra el contanido de la ruta
 	public String toString( String ruta)
 	{
-		String resultado; 
+		String resultado=""; 
 		File f = new File(this.ruta+ ruta);
 		if(f.isDirectory())
 		{
-			resultado = f.getAbsolutePath()+"\r\n";  //Preguntar 
+			resultado = f.getAbsolutePath()+" ";  //Preguntar 
 			File [] f2 = f.listFiles();
 	     
 			for(int i=0;i<f2.length;i++)
 			{
 				if(f2[i].isDirectory()==true)
 				{
-					resultado= resultado+this.toString("\\"+f2[i].getName())+"\r\n";
+					resultado= resultado + f2[i].getAbsolutePath()+" ";
+					resultado= resultado+this.toString("\\"+f2[i].getName())+" ";
 				}
 				else
 				{
-					resultado= resultado+f.getAbsolutePath()+"\r\n";
+					resultado= resultado+f.getAbsolutePath()+" ";
 				}
 	    	 
 			}
 		}
 		else
 		{
-			resultado=f.getAbsolutePath();
+			resultado = resultado+f.getAbsolutePath()+" ";
 		}
 	     
 	    
