@@ -16,56 +16,78 @@ public class ServidorHilo implements Runnable
     private String ruta;
     private DataOutputStream dos;
     private DataInputStream dis;
+
 	
-    public ServidorHilo(Socket s,String usuario, DataOutputStream dos, DataInputStream dis)
+    public ServidorHilo(Socket s,String usuario)
     {
     	this.s=s;
-    	this.ruta="src\\almacen\\"+"usuario";
-    	this.dis=dis;
-    	this.dos=dos;
+    	this.ruta="src/almacen/"+usuario;
+    	try 
+    	{
+			this.dis=new DataInputStream(s.getInputStream());
+		 	this.dos= new DataOutputStream(s.getOutputStream());
+		} 
+    	catch (IOException e) 
+    	{
+			
+			e.printStackTrace();
+		}
+
     }
     
 	public void run() 
 	{
+		String espacios;
 		String bienvenida;
 		String ruta;
 		String extension;
+		String aux2;
+		int tamaño;
 		int opcion =1;
 
-		try 
+		try 					
 		{
-
-			while(opcion<3)
+        	while(opcion<3)
 			{
-				String[] aux=this.ruta.split("\\");
+				String[] aux=this.ruta.split("/");
 				bienvenida="Bienvenido a tu servidor "+aux[aux.length-1];
-				dos.writeChars(bienvenida);
+				bienvenida=bienvenida+"\r\n";
+				dos.writeBytes(bienvenida);
 				
 				//Recibimos la opcion
-				opcion=this.dis.readInt();
+				opcion=dis.readInt();
+				
 				
 				//Enviamos el contenido de nuestro drive
-				dos.writeChars(this.toString(""));
+				espacios=this.toString()+"\r\n";
+				dos.writeBytes(espacios);
 				dos.flush();
 				
 				if(opcion==1)
 				{
 					//recibimos la ruta
 					ruta = dis.readLine();
+					File f = new File(ruta);
 					
 					//Enviamos el nombre del archivo
-					String[] rutas = ruta.split("\\");
+					String[] rutas = ruta.split("/");
 					//Enviamos el nombre del fichero con su extensión si la tiene
-					dos.writeChars(rutas[rutas.length-1]);
+					ruta=rutas[rutas.length-1]+"\r\n";
+					dos.writeBytes(ruta);
 					
-					enviarArchivo(ruta);
+					//Enviamos el tamaño
+					dos.writeLong(f.length());
+
+					
+					enviarArchivo(ruta,f.length());
 				}
 				else if(opcion==2)
 				{
 					//recibimos la ruta
 					ruta=dis.readLine();
+					long ftam=dis.readLong();
 					//recibimos la ruta
-					recibirArchivo(ruta);
+					recibirArchivo(ruta,ftam);
 
 					
 					
@@ -79,6 +101,19 @@ public class ServidorHilo implements Runnable
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		finally
+		{
+			try 
+			{
+				this.dos.close();
+				this.dis.close();
+			} 
+			catch (IOException e) 
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		
@@ -97,7 +132,7 @@ public class ServidorHilo implements Runnable
 		File f = new File(this.ruta+ ruta);
 		if(f.isDirectory())
 		{
-			resultado = f.getAbsolutePath()+" ";  //Preguntar 
+			resultado = f.getAbsolutePath()+" ";  //
 			File [] f2 = f.listFiles();
 	     
 			for(int i=0;i<f2.length;i++)
@@ -105,7 +140,7 @@ public class ServidorHilo implements Runnable
 				if(f2[i].isDirectory()==true)
 				{
 					resultado= resultado + f2[i].getAbsolutePath()+" ";
-					resultado= resultado+this.toString("\\"+f2[i].getName())+" ";
+					resultado= resultado+this.toString("/"+f2[i].getName())+" ";
 				}
 				else
 				{
@@ -125,7 +160,7 @@ public class ServidorHilo implements Runnable
 	
 	
 	//Envia un archivo al cliente
-	public void enviarArchivo(String a)
+	public void enviarArchivo(String a,long tamaño)
 	{
 		File f = new File(a);
 	    
@@ -133,10 +168,12 @@ public class ServidorHilo implements Runnable
 	    {
 			FileInputStream fis = new FileInputStream(f);
 			byte [] buff = new byte[1024*32];
-			int leidos;
-			while((leidos= fis.read(buff))!=-1)
+			int leidos=0;
+			int aux=fis.read(buff);
+			while((leidos= leidos+aux)==tamaño)
 			{
-				this.dos.write(buff, 0, leidos);
+				this.dos.write(buff, 0, aux);
+				aux=fis.read(buff);
 			}
 			dos.flush();
 			//preguntar extension
@@ -155,7 +192,7 @@ public class ServidorHilo implements Runnable
 	}
 	
 	//Recibe un archivo
-	public void  recibirArchivo(String ruta)
+	public void  recibirArchivo(String ruta,long tamaño)
 	{
 		File f = new File(ruta);
 		
@@ -163,10 +200,12 @@ public class ServidorHilo implements Runnable
 		{
 			FileOutputStream fos = new FileOutputStream(f);
 			byte [] buff = new byte[1024*32];
-			int leidos;
-			while((leidos= dis.read(buff))!=-1) 
+			int leidos=0;
+			int aux = dis.read(buff);
+			while((leidos=leidos+aux)==tamaño) 
 			{
-				fos.write(buff, 0, leidos);
+				fos.write(buff, 0, aux);
+				aux = dis.read(buff);
 			}
 		} 
 		catch (FileNotFoundException e) 

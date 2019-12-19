@@ -29,18 +29,17 @@ public class Servidor
 		int opcion;
 		String usuario=null;
 		String contraseña=null;
-		String correoelectronico=null;;
+		String correoelectronico=null;
+		Executor pool = Executors.newCachedThreadPool();
 		
 		try(ServerSocket ss = new ServerSocket(82)){
 			while(true)
 			{	
 				try
-				(
-						Socket s = ss.accept();
-						DataOutputStream dos= new DataOutputStream(s.getOutputStream());
-						DataInputStream dis = new DataInputStream(s.getInputStream())
-						)
 				{
+					   Socket s = ss.accept();
+					   DataOutputStream dos= new DataOutputStream(s.getOutputStream());
+					   DataInputStream dis = new DataInputStream(s.getInputStream());
 					
 				
 						//Pedimos que seleccione una opcion entre registrarse y logearse 
@@ -49,14 +48,19 @@ public class Servidor
 						//Opcion logearse
 						if(opcion==1)
 						{
+							System.out.println("prueba");
 							boolean comprobacion1 = false;
 							
 							while(comprobacion1==false)
 							{
 								//recibimos el usuario
 								usuario=dis.readLine();
+//								System.out.println("usuario: "+usuario);
+//								usuario=dis.readLine();
+								System.out.println("usuario: "+usuario);
 								//comprobamos que el usuario se encuentra en nuestro xml
 								comprobacion1 = comprobacionUsuarioExistente(usuario);
+								System.out.println(comprobacion1);
 								dos.writeBoolean(comprobacion1);
 								if(comprobacion1==true)
 								{
@@ -73,25 +77,34 @@ public class Servidor
 						}
 						else 
 						{
-							boolean comprobacion= false;
-							while(comprobacion==false)
+							boolean comprobacion= true;
+							while(comprobacion==true)
 							{
 								//Recibimos el usuario
 								usuario=dis.readLine();
 								//Comprobamos que el usuario no esta en nustro xml
 								comprobacion=comprobacionUsuarioExistente(usuario);
+								System.out.println(comprobacion);
 								dos.writeBoolean(comprobacion);
 								
 							}
+							System.out.println("Introduce la contraseña");
 							//Recibimos contraseña
 							contraseña=dis.readLine();
 							//Recibimos correoelectronico
+							System.out.println("Introduce el correo electronico");
 							correoelectronico=dis.readLine();
 							aniadirusuarioNuevo(usuario, contraseña, correoelectronico);
+							
+							String aux="src/almacen/"+usuario+"/Bienvenido.txt";
+							usuario="src/almacen/"+usuario;
+							File f = new File(usuario);
+							
+							
 						}
 						
-						Executor pool = Executors.newCachedThreadPool();
-						pool.execute(new ServidorHilo(s,usuario,dos,dis));
+						
+						pool.execute(new ServidorHilo(s,usuario));
 						
 		
 						
@@ -119,7 +132,7 @@ public class Servidor
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db;
 			db = dbf.newDocumentBuilder();
-			Document doc =db.parse(new File("src\\dtds\\Usuarios.xml"));
+			Document doc =db.parse(new File("src/dtds/Usuarios.xml"));
 			
 			//Obtengo el elemento root
 			Element root = doc.getDocumentElement();
@@ -129,8 +142,8 @@ public class Servidor
 			{
 				Element aux2 = (Element) aux.item(i);
 				String usuario = (String) aux2.getAttribute("usuario");
-				
-				if(usuario==a)
+				System.out.println(usuario);
+				if(usuario.equals(a))
 				{
 					esta=true;
 				}
@@ -162,7 +175,7 @@ public class Servidor
 			DocumentBuilder db;
 			db = dbf.newDocumentBuilder();
 			
-			Document doc =db.parse(new File("src\\dtds\\Usuarios.xml"));
+			Document doc =db.parse(new File("src/dtds/Usuarios.xml"));
 			Element root = doc.getDocumentElement();
 			
 			
@@ -185,7 +198,7 @@ public class Servidor
 			DOMSource  source = new DOMSource(doc);
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
-			StreamResult result = new StreamResult(new File("src\\dtds\\Usuarios.xml"));
+			StreamResult result = new StreamResult(new File("src/dtds/Usuarios.xml"));
 			transformer.transform(source, result);
 			b=true;
 		}
@@ -220,7 +233,7 @@ public class Servidor
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db;
 			db = dbf.newDocumentBuilder();
-			Document doc =db.parse(new File("src\\dtds\\Usuarios.xml"));
+			Document doc =db.parse(new File("src/dtds/Usuarios.xml"));
 			
 			//Obtengo el elemento root
 			Element root = doc.getDocumentElement();
@@ -230,7 +243,7 @@ public class Servidor
 				Element aux2 = (Element) aux.item(i);
 				String us1 = (String) aux2.getAttribute("usuario");
 				String contrasena = (String) aux2.getElementsByTagName("contrasena").item(0).getTextContent();
-				if(us1 == usuario && contraseña== contrasena)
+				if(us1.equals(usuario) && contraseña.equals(contrasena))
 				{
 					esta=true;
 				}

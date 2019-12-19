@@ -1,12 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE root SYSTEM "../../bin/dtds/UsuarioyContraseña.dtd" >
-<root>
-  <cliente usuario="vicaball">
-    <contrasena>12345</contrasena>
-    <correoelectronico>vc7@gmail.com</correoelectronico>
-  </cliente>
-  <cliente usuario="jorlaOr">
-    <contrasena>12345</contrasena>
-    <correoelectronico>jor@unirioja.es</correoelectronico>
-  </cliente>
-</root>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><root>
+
+<cliente usuario="vicaball"><contrasena>12345</contrasena><correoelectronico>c@gmail</correoelectronico></cliente><cliente usuario="Juan"><contrasena>12345</contrasena><correoelectronico>v@gmail.com</correoelectronico></cliente><cliente usuario="juan"><contrasena>12345</contrasena><correoelectronico>vrtvfyag@</correoelectronico></cliente><cliente usuario="pedro"><contrasena>12345</contrasena><correoelectronico>sqfq45</correoelectronico></cliente><cliente usuario="Juanito"><contrasena>12345</contrasena><correoelectronico>vrt44</correoelectronico></cliente><cliente usuario="elm"><contrasena>12345</contrasena><correoelectronico>hola@55</correoelectronico></cliente><cliente usuario=" luis"><contrasena>12345</contrasena><correoelectronico> vr5@d</correoelectronico></cliente><cliente usuario="Pedro"><contrasena>12345</contrasena><correoelectronico>lol</correoelectronico></cliente><cliente usuario="emm"><contrasena>12345</contrasena><correoelectronico>12345@jol</correoelectronico></cliente></root>
